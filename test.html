@@ -16,66 +16,50 @@
         font-size: 16px;
         width: 100vw;
         height: 100vh;
-        display: flex;
-        flex-direction: column;
         overflow: hidden;
       }
 
-      /* 헤더 */
+      .container {
+        display: table;
+        width: 100%;
+        height: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+      }
+
+      /* 헤더 스타일 */
       .header {
-        /* align */
-        display: flex;
-        align-items: center;
-        justify-content: start;
-        gap: 15px;
-        /* box */
+        display: table-row-group;
         background-color: #0d47a1;
         color: white;
-        padding: 10px 20px;
+        height: 60px;
       }
 
-      .header .search-group {
-        display: flex;
-        align-items: center;
-
-        gap: 10px;
+      .header td {
+        width: 100%;
+        padding: 10px;
+        vertical-align: middle;
+        text-align: left;
       }
 
-      .selectdate {
+      .search_selectdate {
         width: 150px;
         font-size: 20px;
         padding: 1%;
         background-color: transparent;
         color: white;
         border: 1px solid white;
-        text-align: center;
       }
 
-      /* 푸터 */
-      .footer {
-        /* align */
-        display: flex;
-        align-items: center;
-        justify-content: end;
-        padding: 10px 20px;
-        /* box */
-        background-color: #0d47a1;
-      }
-
-      
-      /*######
-       본문
-       ###### */
+      /* 본문 스타일 */
       .content {
-        flex: 1;
+        display: table-row-group;
       }
 
       .table-wrapper {
         width: 100%;
-        max-height: calc(100vh - 140px);
+        height: calc(100vh - 180px); /* 헤더와 푸터의 높이를 제외한 부분 */
         overflow-y: auto;
-        border: 1px solid #ccc;
-        border-radius: 5px;
       }
 
       table {
@@ -85,10 +69,6 @@
 
       thead {
         background-color: #e3e3e3;
-        /* 위치고정 */
-        position: sticky;
-        z-index: 1;
-        top: 0;
       }
 
       th,
@@ -98,38 +78,8 @@
         border-bottom: 1px solid #ccc;
       }
 
-      .checkbox-line {
-        display: flex;
-        gap: 10px;
-      }
-
-      .checkbox{
-        zoom: 1.5; /* 체크박스 크기 1.5배 */
-      }
-
-
-
-      /* 버튼 */
-      .big_btn {
-        /* align */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        /* box */
-        width: 130px;
-        padding: 10px 0;
-        border: none;
-        border-radius: 20px;
-        background-color: #799dc8;
-        /* components */
-        color: white;
-        font-weight: bold;
-        font-size: 15px;
-      }
-
-      .big_btn img {
-        width: 25px;
+      .check-td{
+        text-align: left;
       }
 
       /* 저장일 정렬 버튼 */
@@ -141,73 +91,133 @@
         margin-left: 5px;
         vertical-align: middle;
       }
+
+      /* 푸터 스타일 */
+      .footer {
+        display: table-row-group;
+        height: 60px;
+        background-color: #0d47a1;
+      }
+
+      .footer td {
+        width: 100%;
+        vertical-align: middle;
+      }
+
+      .fotter-td{
+        text-align: right;
+      }
+
+      .checnbox{
+        transform: scale(1.5);
+        margin-right: 5px;
+      }
+
+      /* 버튼 스타일 */
+      .big_btn {
+        margin-left: 20px;
+        /* box */
+        width: 130px;
+        background-color: #799dc8;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        height: 50px;
+        line-height: 50px;
+        /* font */
+        font-weight: bold;
+        font-size: 15px;
+        /* align */
+        vertical-align: middle;
+        display: inline-block;
+      }
+
+      .big_btn img {
+        display: inline-block;
+        width: 30px;
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+
+
     </style>
   </head>
   <body>
-    <!-- 헤더 -->
-    <div class="header">
-      <div class="search-group">
-        <span style="font-size: 18px; font-weight: bold">조회 기간</span>
-        <input class="selectdate" value="2025-03-13" /> ~
-        <input class="selectdate" value="2025-03-20" />
-      </div>
-      <button class="big_btn">
-        <img src="./resources/search_icon.png" alt="" /> 검색
-      </button>
-    </div>
+    <table class="container">
+      <!-- 헤더 -->
+      <tbody class="header">
+        <tr>
+          <td colspan="3">
+            <span style="font-size: 18px; font-weight: bold; margin-right: 20px;">조회 기간</span>
+            <input class="search_selectdate" value="2025-03-13" /> ~
+            <input class="search_selectdate" value="2025-03-20" />
+            <button class="big_btn">
+              <img src="./resources/search_icon.png" alt="" />검색
+            </button>
+          </td>
+        </tr>
+      </tbody>
 
-    <!-- 본문 -->
-    <div class="content">
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>저장일 <button class="sort-button">⬆⬇</button></th>
-              <th>동의서 명</th>
-              <th class="checkbox-line"><input type="checkbox" class="checkbox"/> 전체선택</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>2025-03-12</td>
-              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-            <tr>
-              <td>2025-03-12</td>
-              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-            <tr>
-              <td>2025-03-12</td>
-              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-            <tr>
-              <td>2025-03-12</td>
-              <td>기관지내시경 검사에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-            <tr>
-              <td>2025-03-12</td>
-              <td>로봇을 이용한 식도암 절제술에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-            <tr>
-              <td>2025-03-12</td>
-              <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <!-- 본문 -->
+      <tbody class="content">
+        <tr>
+          <td colspan="3">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>
+                      저장일
+                      <button class="sort-button">⬆⬇</button>
+                    </th>
+                    <th>동의서 명</th>
+                    <th class="check-td"><input class="checnbox" type="checkbox" /> 전체선택</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2025-03-12</td>
+                    <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
+                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
+                  </tr>
+                  <tr>
+                    <td>2025-03-12</td>
+                    <td>신체보호대 사용에 대한 설명 및 동의서</td>
+                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
+                  </tr>
+                  <tr>
+                    <td>2025-03-12</td>
+                    <td>기관지내시경 검사에 대한 설명 및 동의서</td>
+                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
+                  </tr>
+                  <tr>
+                    <td>2025-03-12</td>
+                    <td>로봇을 이용한 식도암 절제술에 대한 설명 및 동의서</td>
+                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
+                  </tr>
+                  <tr>
+                    <td>2025-03-12</td>
+                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
+                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
+                  </tr>
+                  <tr></tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
 
-    <!-- 푸터 -->
-    <div class="footer">
-      <button class="big_btn">
-        <img src="./resources/check_icon.png" alt="" /> 연동
-      </button>
-    </div>
+      <!-- 푸터 -->
+      <tbody class="footer">
+        <tr>
+          <td class="fotter-td" colspan="3">
+            <button class="big_btn">
+              <img src="./resources/check_icon.png" alt="" />연동
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
