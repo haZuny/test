@@ -1,29 +1,213 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexbox 테스트</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>동의서 조회</title>
     <style>
-        .container {
-            display: flex;
-            background-color: lightgray;
-            height: 100px;
-        }
-        .box {
-            width: 50px;
-            height: 50px;
-            background-color: tomato;
-        }
-    </style>
-</head>
-<body>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    <div class="container">
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* 헤더 */
+      .header {
+        /* align */
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 15px;
+        /* box */
+        background-color: #0d47a1;
+        color: white;
+        padding: 10px 20px;
+      }
+
+      .header .search-group {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+      }
+
+      .selectdate {
+        width: 150px;
+        font-size: 20px;
+        padding: 1%;
+        background-color: transparent;
+        color: white;
+        border: 1px solid white;
+        text-align: center;
+      }
+
+      /* 푸터 */
+      .footer {
+        /* align */
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        padding: 10px 20px;
+        /* box */
+        background-color: #0d47a1;
+      }
+
+      
+      /*######
+       본문
+       ###### */
+      .content {
+        flex: 1;
+      }
+
+      .table-wrapper {
+        width: 100%;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        background-color: #e3e3e3;
+        /* 위치고정 */
+        position: sticky;
+        z-index: 1;
+        top: 0;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .checkbox-line {
+        display: flex;
+        gap: 10px;
+      }
+
+      .checkbox{
+        zoom: 1.5; /* 체크박스 크기 1.5배 */
+      }
+
+
+
+      /* 버튼 */
+      .big_btn {
+        /* align */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        /* box */
+        width: 130px;
+        padding: 10px 0;
+        border: none;
+        border-radius: 20px;
+        background-color: #799dc8;
+        /* components */
+        color: white;
+        font-weight: bold;
+        font-size: 15px;
+      }
+
+      .big_btn img {
+        width: 25px;
+      }
+
+      /* 저장일 정렬 버튼 */
+      .sort-button {
+        font-size: 14px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        margin-left: 5px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 헤더 -->
+    <div class="header">
+      <div class="search-group">
+        <span style="font-size: 18px; font-weight: bold">조회 기간</span>
+        <input class="selectdate" value="2025-03-13" /> ~
+        <input class="selectdate" value="2025-03-20" />
+      </div>
+      <button class="big_btn">
+        <img src="./resources/search_icon.png" alt="" /> 검색
+      </button>
     </div>
 
-</body>
+    <!-- 본문 -->
+    <div class="content">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>저장일 <button class="sort-button">⬆⬇</button></th>
+              <th>동의서 명</th>
+              <th class="checkbox-line"><input type="checkbox" class="checkbox"/> 전체선택</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-03-12</td>
+              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+            <tr>
+              <td>2025-03-12</td>
+              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+            <tr>
+              <td>2025-03-12</td>
+              <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+            <tr>
+              <td>2025-03-12</td>
+              <td>기관지내시경 검사에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+            <tr>
+              <td>2025-03-12</td>
+              <td>로봇을 이용한 식도암 절제술에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+            <tr>
+              <td>2025-03-12</td>
+              <td>경피적 담석제거술에 대한 설명 및 동의서</td>
+              <td class="checkbox-line"><input type="checkbox" class="checkbox"/></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <div class="footer">
+      <button class="big_btn">
+        <img src="./resources/check_icon.png" alt="" /> 연동
+      </button>
+    </div>
+  </body>
 </html>
