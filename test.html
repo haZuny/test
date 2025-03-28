@@ -200,7 +200,7 @@
       var textEditControlerName = request.getParameter("controlnm");
       var patientCd = request.getParameter("patientcd");
       var instCd = request.getParameter("instcd");
-      var instUrlPath = 'emr'+instCd+'edu';
+      var instUrlPath = "emr" + instCd + "edu";
       var clnDate = request.getParameter("clndate");
 
       // 초기화 및 이벤트 정의
@@ -336,7 +336,9 @@
           alert("날짜 범위를 지정해주세요");
         } else {
           var url =
-            "http://"+instUrlPath+".cmcnu.or.kr/eform/biz/nu/member/viewer/eForm25/consent/mst/get";
+            "http://" +
+            instUrlPath +
+            ".cmcnu.or.kr/eform/biz/nu/member/viewer/eForm25/consent/mst/get";
           var param = {
             __type: "GetConsents:#ArumNuri_Consent",
             startDate: sdate.replace(/-/g, ""),
@@ -352,8 +354,8 @@
             // dataType: 'json',
             timeout: 40000,
             success: function (result) {
-              verbalList = result.filter(function(consent){
-                return consent.verbalMultiFlag == 'V,N'
+              verbalList = result.filter(function (consent) {
+                return consent.verbalMultiFlag == "V,N";
               });
               callback();
             },
@@ -361,6 +363,104 @@
               alert(
                 "구두동의 목록을 받아오는 중 예외가 발생했습니다.\n다시 시도해 주세요."
               );
+              verbalList = [
+                { modifyDatetime: "2020-12-01", formName: "aaaaaaa", verbalMultiFlag: 'V,N' },
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+                { modifyDatetime: "2020-12-05", formName: "aaaaaa" ,verbalMultiFlag: 'V,N'},
+              ];
+              makeTableList();
             },
           });
         }
