@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>동의서 조회</title>
+    <title>CMC</title>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="./css/flatpicker.css" />
+    <!-- lib import -->
+    <script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+    <script src="./js/flatpickr.js"></script>
+
     <style>
       * {
         margin: 0;
@@ -70,6 +76,9 @@
 
       thead {
         background-color: #e3e3e3;
+        z-index: 1;
+        top: 0;
+        position: sticky;
       }
 
       th,
@@ -80,11 +89,11 @@
         font-weight: bold;
       }
 
-      .title{
+      .title {
         font-size: 20px;
       }
 
-      .check-td{
+      .check-td {
         text-align: left;
       }
 
@@ -96,6 +105,12 @@
         cursor: pointer;
         margin-left: 5px;
         vertical-align: middle;
+      }
+      .sort-button img {
+        width: 50px;
+        padding: 0 5px;
+        border-radius: 20px;
+        background-color: white;
       }
 
       /* 푸터 스타일 */
@@ -110,11 +125,11 @@
         vertical-align: middle;
       }
 
-      .fotter-td{
+      .fotter-td {
         text-align: right;
       }
 
-      .checnbox{
+      .checkbox {
         transform: scale(1.5);
         margin-right: 5px;
       }
@@ -144,20 +159,317 @@
         margin-right: 5px;
         vertical-align: middle;
       }
-
-
+      body {
+        user-select: none; /* 텍스트 선택 비활성화 */
+      }
     </style>
+
+    <script>
+      /*
+    1. 환자번호, 수진일을 데이터로 받아온다.
+    2. 검색 버튼을 누르면, ajax로 검색한다.
+        - 환자번호, 수진일, 작성기간
+            - COMPLETE_YN이 Y일때만?
+            - nope! Verbal_Multiflag가 V,Y? V,N?
+    3. 검색 결과를 리스트에 띄운다.
+    4. 선택버튼은 구현된대로ㅇㅇㅇ
+    */
+      // variables
+      const maxCnt = 9;
+
+      var verbalList = [];
+
+      var Request = function () {
+        this.getParameter = function (name) {
+          var rtnval = "";
+          var nowAddress = unescape(location.href);
+          var parameters = nowAddress
+            .slice(nowAddress.indexOf("?") + 1, nowAddress.length)
+            .split("&");
+          for (var i = 0; i < parameters.length; i++) {
+            var varName = parameters[i].split("=")[0];
+            if (varName.toUpperCase() == name.toUpperCase()) {
+              rtnval = parameters[i].split("=")[1];
+              break;
+            }
+          }
+          return rtnval;
+        };
+      };
+      var request = new Request();
+      var textEditControlerName = request.getParameter("controlnm");
+      var patientCd = request.getParameter("patientcd");
+      var instCd = request.getParameter("instcd");
+      var instUrlPath = 'emr'+instCd+'edu';
+      var clnDate = request.getParameter("clndate");
+
+      // 초기화 및 이벤트 정의
+      $(document).ready(function () {
+        // 초기 날짜를 한달 전으로 기본 세팅
+        var today = new Date();
+        var lastMonth = new Date();
+        lastMonth.setMonth(today.getMonth() - 1);
+
+        $("#search_selectdate_1").val(
+          lastMonth.getFullYear() +
+            "-" +
+            ("0" + (parseInt(lastMonth.getMonth()) + 1)).slice(-2) +
+            "-" +
+            lastMonth.getDate()
+        );
+
+        $("#search_selectdate_2").val(
+          today.getFullYear() +
+            "-" +
+            ("0" + (parseInt(today.getMonth()) + 1)).slice(-2) +
+            "-" +
+            today.getDate()
+        );
+
+        // `전체선택` 버튼 클릭시 이벤트
+        $("#all-check").click(function () {
+          // 모든 체크박스 선택택
+          $(".checkbox").prop("checked", $("#all-check").prop("checked"));
+
+          // 최대 갯수 유효성 검증
+          var checkedLength = $(".table-row input.checkbox:checked").length;
+          if (checkedLength > maxCnt) {
+            alert(
+              "최대 선택 가능한 개수가 초과되었습니다.\n선택된 항목을 확인해 주세요."
+            );
+          }
+        });
+
+        // `연동` 버튼 클릭시 이벤트
+        $("#done_button").click(function () {
+          // 현재 체크된 목록 가져오기
+          var selectedItems = [];
+          $(".table-row input.checkbox:checked").each(function () {
+            var row = $(this).closest("tr"); // 체크박스를 포함하는 tr 요소 찾기
+            var date = row.find("td").eq(0).text(); // 첫 번째 td 값 (날짜)
+            var name = row.find("td").eq(1).text(); // 두 번째 td 값 (이름름)
+            selectedItems.push(name + " " + date);
+          });
+
+          if (selectedItems.length > maxCnt) {
+            alert(
+              "최대 선택 가능한 개수가 초과되었습니다.\n선택된 항목을 확인해 주세요."
+            );
+            return;
+          }
+
+          // 적용할 문자열 생성
+          var targetText = "전화(구두)동의 동의서 -> 추가 서면동의를 받음\n";
+          for (var i = 0; i < selectedItems.length; i++) {
+            targetText += "- " + selectedItems[i] + "\n";
+          }
+
+          // 디자이너 연동
+          var osObject = getOsObject();
+          setControlsValueReturn(textEditControlerName, targetText);
+        });
+
+        // 검색 버튼 클릭시 이벤트
+        $("#search_btn_search").click(function () {
+          // 날짜값 가져오기
+          var sdate = $("#search_selectdate_1").val();
+          var edate = $("#search_selectdate_2").val();
+
+          // 검색
+          searchVerbalList(sdate, edate, makeTableList);
+        });
+
+        // 정렬 버튼 클릭시 이벤트
+        var isAsc = true;
+        $(".sort-button").click(function () {
+          var tableCheckList = $(".table-row input.checkbox");
+          tableCheckList.each(function (idx, item) {
+            if ($(item).prop("checked") == true) {
+              verbalList[idx].checked = true;
+            } else {
+              verbalList[idx].checked = false;
+            }
+          });
+          isAsc = isAsc ? false : true;
+          // 리스트 정렬
+          verbalList.sort(function (a, b) {
+            var alignOption = isAsc ? 1 : -1;
+            return (
+              alignOption *
+              (a.modifyDatetime < b.modifyDatetime
+                ? -1
+                : a.modifyDatetime > b.modifyDatetime
+                ? 1
+                : 0)
+            );
+          });
+          // 테이블에 표시
+          makeTableList();
+        });
+
+        ///
+        // 마우스 드래그 이벤트
+        ///
+        let isDragging = false; // 드래그 상태 여부
+        let startY = 0; // 드래그 시작 위치
+        let scrollTop = 0; // 스크롤 위치
+        $("#result_tbody").on("mousedown", function (event) {
+          isDragging = true;
+          startY = event.clientY; // 드래그 시작 시의 Y 좌표 저장
+          scrollTop = $(".table-wrapper").scrollTop(); // 현재 스크롤 위치 저장
+        });
+        $(document).on("mousemove", function (event) {
+          if (isDragging) {
+            event.preventDefault();
+            const distance = event.clientY - startY; // 드래그 이동 거리 계산
+            $(".table-wrapper").scrollTop(scrollTop - distance); // 페이지 스크롤
+          }
+        });
+        $(document).on("mouseup", function () {
+          isDragging = false; // 드래그 종료
+        });
+      });
+
+      // 작성일자로 해당 환자의 구두동의 목록을 검색
+      function searchVerbalList(sdate, edate, callback) {
+        if (sdate == "" || edate == "") {
+          alert("날짜 범위를 지정해주세요");
+        } else {
+          var url =
+            "http://"+instUrlPath+".cmcnu.or.kr/eform/biz/nu/member/viewer/eForm25/consent/mst/get";
+          var param = {
+            __type: "GetConsents:#ArumNuri_Consent",
+            startDate: sdate.replace(/-/g, ""),
+            endDate: edate.replace(/-/g, ""),
+            instcd: instCd,
+            patientCode: patientCd,
+            searchMode: "normal",
+          };
+          $.ajax({
+            url: url,
+            data: "parameter=" + JSON.stringify(param),
+            method: "POST",
+            // dataType: 'json',
+            timeout: 40000,
+            success: function (result) {
+              verbalList = result.filter(function(consent){
+                return consent.verbalMultiFlag == 'V,N'
+              });
+              callback();
+            },
+            error: function (xhr, status, error) {
+              alert(
+                "구두동의 목록을 받아오는 중 예외가 발생했습니다.\n다시 시도해 주세요."
+              );
+            },
+          });
+        }
+      }
+
+      // 현재 조회된 값을 기준으로, 테이블 리스트를 만든다.
+      function makeTableList() {
+        var tbody = $("#result_tbody"); // 테이블의 tbody 요소를 선택
+        tbody.empty();
+
+        // 데이터 배열을 순회하면서 <li> 항목을 생성
+        verbalList.forEach(function (item) {
+          // 구두동의만 리스트에 표현
+          if (item.verbalMultiFlag != "V,N") {
+            return;
+          }
+
+          // <tr> 요소 생성 (class="table-row")
+          var tr = $("<tr>").addClass("table-row");
+
+          // <td> 요소를 생성하여 <tr>에 추가
+          var tdDate = $("<td>").text(item.modifyDatetime.split(" ")[0]); // 날짜
+          var tdDescription = $("<td>").text(item.formName); // 설명
+
+          if (
+            item.checked == undefined ||
+            item.checked == "undefined" ||
+            item.checked == ""
+          ) {
+            var tdCheckbox = $("<td>").addClass("check-td").append(
+              $("<input>").attr("type", "checkbox").addClass("checkbox") // 체크박스
+            );
+          } else {
+            var tdCheckbox = $("<td>").addClass("check-td").append(
+              $("<input>")
+                .attr("type", "checkbox")
+                .addClass("checkbox")
+                .prop("checked", true) // 체크된 상태로 설정
+                .appendTo("body") // 본문에 추가
+            );
+          }
+
+          // <tr>에 <td>들을 추가
+          tr.append(tdDate, tdDescription, tdCheckbox);
+
+          // <tbody>에 <tr>을 추가
+          tbody.append(tr);
+        });
+      }
+
+      //현재 브라우저가 띄워져 있는 환경을 체크하여 상위 오브젝트(e-Form Viewer)를 넘겨준다.
+      function getOsObject() {
+        var strOs = OSCheck();
+
+        var result;
+        if (strOs == "Android") {
+          result = window.android;
+        } else if (strOs == "Windows") {
+          result = window.external;
+        }
+
+        return result;
+      }
+
+      //현재 선택된 콤보박스의 값을 리턴해준다.
+      function setControlsValueReturn(control, value) {
+        var osObject = getOsObject();
+
+        //받는 서식의 컨트롤에 value값을 리턴해준다.(SetControlValue('컨트롤아이디', 리턴값);)
+        osObject.SetControlValue(control, value);
+
+        //받는 서식의 팝업컨트롤에 값을 리턴해준다.
+        //osObject.SetPopupResult(value);
+        osObject.OkClose();
+      }
+
+      //현재 브라우저가 띄워져 있는 환경을 체크한다.
+      function OSCheck() {
+        var playerOS = "dont know";
+
+        if (navigator.userAgent.match(/iPhone|iPad/gi)) {
+          playerOS = "iOS";
+        } else if (navigator.userAgent.match(/Android/gi)) {
+          playerOS = "Android";
+        } else if (navigator.userAgent.match(/Windows/gi)) {
+          playerOS = "Windows";
+        } else if (navigator.userAgent.match(/Linux/gi)) {
+          playerOS = "Linux";
+        }
+        if (navigator.userAgent.match(/OSX/gi)) {
+          playerOS = "Mac OS";
+        }
+        return playerOS;
+      }
+    </script>
   </head>
+
   <body>
     <table class="container">
       <!-- 헤더 -->
       <tbody class="header">
         <tr>
           <td colspan="3">
-            <span style="font-size: 18px; font-weight: bold; margin-right: 20px;">조회 기간</span>
-            <input class="search_selectdate" value="2025-03-13" /> ~
-            <input class="search_selectdate" value="2025-03-20" />
-            <button class="big_btn">
+            <span style="font-size: 18px; font-weight: bold; margin-right: 20px"
+              >조회 기간</span
+            >
+            <input id="search_selectdate_1" class="search_selectdate" /> ~
+            <input id="search_selectdate_2" class="search_selectdate" />
+            <button id="search_btn_search" class="big_btn">
               <img src="./resources/search_icon.png" alt="" />검색
             </button>
           </td>
@@ -174,208 +486,25 @@
                   <tr>
                     <th class="title">
                       저장일
-                      <button class="sort-button"><img src="./resources/align_icon.png"></button>
+                      <button class="sort-button">
+                        <img src="./resources/align_icon.png" />
+                      </button>
                     </th>
                     <th class="title">동의서 명</th>
-                    <th class="check-td title"><input class="checnbox" type="checkbox" /> 전체선택</th>
+                    <th class="check-td title">
+                      <input id="all-check" class="checkbox" type="checkbox" />
+                      전체선택
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
+                <tbody id="result_tbody">
+                  <!-- <tr class="table-row">
                     <td>2025-03-12</td>
                     <td>MIR 비급여 검사에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>신체보호대 사용에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>기관지내시경 검사에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>로봇을 이용한 식도암 절제술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
-                  <tr>
-                    <td>2025-03-12</td>
-                    <td>경피적 담석제거술에 대한 설명 및 동의서</td>
-                    <td class="check-td"><input class="checnbox" type="checkbox" /></td>
-                  </tr>
+                    <td class="check-td">
+                      <input class="checkbox" type="checkbox" />
+                    </td>
+                  </tr> -->
                 </tbody>
               </table>
             </div>
@@ -387,12 +516,20 @@
       <tbody class="footer">
         <tr>
           <td class="fotter-td" colspan="3">
-            <button class="big_btn">
+            <button id="done_button" class="big_btn">
               <img src="./resources/check_icon.png" alt="" />연동
             </button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <!-- flatpickr -->
+    <script>
+      flatpickr(".search_selectdate", {
+        dateFormat: "Y-m-d",
+        defaultDate: new Date(),
+      });
+    </script>
   </body>
 </html>
